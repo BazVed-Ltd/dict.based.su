@@ -1,4 +1,9 @@
 const resp = await fetch('/dict.json')
 const dictionary = await resp.json()
+document.getElementById('dictionary').innerHTML = ''.concat(...Object.entries(dictionary).map((s, index) => `<li class="cont" id="${index}""><div class="description">${s[0]} - ${s[1]["meaning"]}</div><i class="arrow fa-solid fa-arrow-right fa-lg"></i></li>`))
 
-document.getElementById('dictionary').innerHTML = ''.concat(...Object.entries(dictionary).map(s => `<li><b>${s[0]}</b> - ${s[1]}</li>`))
+let conts = document.getElementsByClassName('cont')
+var arr = Array.prototype.slice.call( conts )
+arr.map(s => {
+    s.onclick = function opend() {localStorage.setItem('page', `${this.id}`); window.open('page.html', "_self")}
+})

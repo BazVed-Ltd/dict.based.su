@@ -3,15 +3,80 @@
 <head>
     <meta charset="utf8">
     <meta name='viewport' content='width=device-width,initial-scale=1'>
-    <title>Словарь фриспика</title>
+    <title>Словарь фриспиковца</title>
+    <script src="https://kit.fontawesome.com/1c40832f28.js" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,400;1,400&display=swap');
+        *
+        {
+            margin: 0px;
+            padding: 0px;
+            font-family: 'Roboto', sans-serif;
+
+        }
+        li 
+        {
+            position: relative;
+            list-style: none;
+        }
+        .name
+        {
+            display: inline;
+        }
+        .description
+        {
+            display: inline-block;
+            width: fit-content;
+            padding-right: 37.5px;
+            word-break: break-word;
+        }
+        .cont
+        {
+            width: 520px;
+            border: 1px solid #1a1a1a;
+            padding: 20px;
+            cursor: pointer;
+            margin-top: 10px;    
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+        .arrow
+        {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            display: none;
+            cursor: pointer;
+        }
+        .cont:hover > .arrow
+        {
+            display: block;
+        }
+        #title
+        {
+            width: fit-content;
+            padding: 20px;
+            margin: auto;
+            margin-top: 50px;
+            font-size: 40px;
+            
+        }
+        #dictionary
+        {
+            margin: auto;
+            margin-top: 20px;
+            width: fit-content;
+        }
+    </style>
 </head>
 
 <body>
-    <h3>
-        Словаь фриспиковца
-    </h3>
+    <div id="title">
+        Словарь фриспиковца
+    </div>
     <ul id="dictionary">
     </li>
+    
     <script src="/index.js" type="module" async></script>
 </body>
 </html>

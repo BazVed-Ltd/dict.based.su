@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,400;1,400&display=swap');
+        *
+        {
+            margin: 0px;
+            padding: 0px;
+            font-family: 'Roboto', sans-serif;
+
+        }
+        body
+        {
+            position: relative;
+        }
+        #pics
+        {
+            width: 500px;
+            display: block;
+            position: absolute;
+            right: 120px;
+            top: 120px;
+            /* margin-right: 60px; */
+        }
+        #cont
+        {
+            width: fit-content;
+            display: block;
+            position: absolute;
+            left: 120px;
+        }
+
+        #title
+        {
+            font-size: 40px;
+            margin-top: 20px;
+        }
+        .group
+        {
+            max-width: 100%;
+            float: right;
+            border: 1px solid #c2c2c2;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .group img
+        {
+            max-width: 100%;
+        }
+        #history
+        {
+            font-size: 20px;
+            margin-top: 20px;
+            width: 600px;
+        }
+        #back
+        {
+            width: 80px;
+            height: 40px;
+            margin-left: 120px;
+            margin-top: 40px;
+            outline: none;
+            border: 1px solid #c2c2c2;
+            background-color: #fff;
+            border-radius: 10px;
+        }
+        .desc
+        {
+            border-top: 1px solid #c2c2c2;
+        }
+
+        @media only screen and (max-width: 1340px) {
+            #pics
+            {
+                position: relative;
+                left: 40px;
+                top: 40px;
+            }
+            #cont
+            {
+                position: relative;
+                left: 40px; 
+            }
+            #back
+            {
+                margin-left: 0px;
+                position: relative;
+                left: 40px; 
+            }
+            .group
+            {
+                float: left;
+            }
+        }
+        @media only screen and (max-width: 800px) {
+            #pics
+            {
+                max-width: 400px;
+            }
+            #cont
+            {
+                max-width: 400px;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <button id="back">Назад</button>
+    <div id="cont">
+        <h1 id="title"></h1>
+        <div id="date"></div>
+        <div id="author"></div>
+        <div id="history"></div>
+    </div>
+    <div id="pics"></div>
+    <script type="module" async>
+        const page = localStorage.getItem('page')
+        const resp = await fetch('/dict.json')
+        const dictionary = await resp.json()
+        var back = document.getElementById('back')
+        back.onclick = () => window.open('index.html', '_self')
+        
+        var title = document.getElementById('title')
+        var date = document.getElementById('date')
+        var author = document.getElementById('author')
+        var history = document.getElementById('history')
+        var pics = document.getElementById('pics')
+
+        Object.entries(dictionary).map((s, index) =>{
+            if (index == page)
+            {
+                title.innerText = s[0]
+                document.title = s[0]
+                date.innerText = s[1]["date"]
+                author.innerText = 'Автор: ' + s[1]["author"]
+                history.innerText = s[1]["history"]
+                s[1]["pics"].map((pic, index) => {
+                    let group = document.createElement('div')
+                    group.className = "group"
+                    group.innerHTML = `<img src='/pics/${pic["src"]}'>` + `<div class="desc">${pic["desc"]}</div>`
+                    if (index > 0)
+                    {
+                        group.style.width = "300px";
+                    }
+                    pics.appendChild(group)
+                })
+            }
+        })
+    </script>
+</body>
+</html>
