@@ -183,7 +183,7 @@
             if (index == page)
             {
                 share.onclick = () => {
-                    navigator.clipboard.writeText('https://' + window.location.hostname + `/index.html/?subj=${s[0]}`)
+                    navigator.clipboard.writeText('https://' + window.location.hostname + `/?subj=${s[0]}`)
                 }
                 title.innerText = s[0]
                 document.title = s[0]
