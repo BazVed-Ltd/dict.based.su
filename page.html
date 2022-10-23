@@ -16,6 +16,12 @@
         body
         {
             position: relative;
+            overflow-y: scroll;
+        
+        }
+        a
+        {
+            text-decoration: none;
         }
         #pics
         {
@@ -150,7 +156,7 @@
                 document.title = s[0]
                 date.innerText = s[1]["date"]
                 author.innerText = 'Автор: ' + s[1]["author"]
-                history.innerText = s[1]["history"]
+                history.innerHTML = s[1]["history"]
                 s[1]["pics"].map((pic, index) => {
                     let group = document.createElement('div')
                     group.className = "group"
