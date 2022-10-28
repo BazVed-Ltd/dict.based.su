@@ -165,9 +165,49 @@
     </div>
     <div id="pics"></div>
     <script type="module" async>
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js";
+        import { getDatabase, ref, get, child } from 'https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js'
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxNxc57M_MX7Eq6I0BdTpw6y2ao7sC9rc",
+            authDomain: "dict-91af6.firebaseapp.com",
+            projectId: "dict-91af6",
+            storageBucket: "dict-91af6.appspot.com",
+            messagingSenderId: "43053199779",
+            appId: "1:43053199779:web:49d0a3fe6d50dde6b46a16",
+            databaseURL: "https://dict-91af6-default-rtdb.europe-west1.firebasedatabase.app/"
+
+        };
+
+        const app = await initializeApp(firebaseConfig);
+        const db = await getDatabase(app);
+
+        async function readDb()
+        {
+            await get(child(ref(db), 'dict')).then((snapshot) => 
+            {
+                if (snapshot.exists()) 
+                {
+                    localStorage.setItem('snapshot', JSON.stringify(snapshot.val()))
+                    return snapshot.val()
+                }
+                else
+                {
+                    alert('no data')
+                }
+            }) 
+            .catch((error) => 
+            {
+                console.error(error);
+            });
+            let data = localStorage.getItem('snapshot')
+            localStorage.removeItem('snapshot')
+            return data
+        }
+
+        const dictionary = JSON.parse(await readDb())
         const page = localStorage.getItem('page')
-        const resp = await fetch('/dict.json')
-        const dictionary = await resp.json()
+
         var back = document.getElementById('back')
         back.onclick = () => window.open('index.html', '_self')
         
@@ -180,7 +220,8 @@
         var pics = document.getElementById('pics')
 
         Object.entries(dictionary).map((s, index) =>{
-            if (index == page)
+            console.log(page, s[0])
+            if (s[0] == page)
             {
                 share.onclick = () => {
                     navigator.clipboard.writeText('https://' + window.location.hostname + `/?subj=${s[0]}`)

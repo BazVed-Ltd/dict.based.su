@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="https://kit.fontawesome.com/1c40832f28.js" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,400;1,400&display=swap');
+        *
+        {
+            margin: 0px;
+            padding: 0px;
+            font-family: 'Roboto', sans-serif;
+
+        }
+        body
+        {
+            position: relative;
+            overflow-y: scroll;
+        
+        }
+        a
+        {
+            text-decoration: none;
+        }
+        #pics
+        {
+            width: 500px;
+            display: block;
+            position: absolute;
+            right: 120px;
+            top: 120px;
+            /* margin-right: 60px; */
+        }
+        #contt
+        {
+            width: 50%;
+            display: block;
+            position: absolute;
+            left: 120px;
+        }
+
+        #title
+        {
+            display: block;
+            font-size: 40px;
+            margin-top: 20px;
+            width: fit-content;
+        }
+        .group
+        {
+            max-width: 100%;
+            float: right;
+            border: 1px solid #c2c2c2;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .group img
+        {
+            max-width: 100%;
+        }
+        #history
+        {
+            display: block;
+            font-size: 20px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .desc
+        {
+            border-top: 1px solid #c2c2c2;
+        }
+        #editor
+        {
+            width: 100%;
+            height: 24px;
+            background-color: rgba(30, 255, 0);
+
+        }
+        #editor text
+        {
+            color: #1a1a1a;
+            margin-left: 120px;
+        }
+        #conteiner
+        {
+            display: inline;
+            margin-left: 20px;
+        }
+        #yes, .close
+        {
+            width: 20px;
+            height: 20px;
+            outline: none;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 5px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+        #author, #date
+        {
+            display: block;
+            width: fit-content;
+        }
+        #addImage
+        {
+            width: 300px;
+            height: 50px;
+            float: right;
+            border: 1px solid #c2c2c2;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+
+        @media only screen and (max-width: 1340px) {
+            #pics
+            {
+                position: relative;
+                left: 40px;
+                top: 40px;
+            }
+            #contt
+            {
+                position: relative;
+                left: 40px; 
+            }
+            
+            .group, #addImage
+            {
+                float: left;
+            }
+        }
+        @media only screen and (max-width: 800px) {
+            #pics
+            {
+                width: 350px;
+                left: 5px;
+            }
+            #editor text
+            {
+                margin-left: 5px;
+            }
+            #history
+            {
+                width: 350px;
+            }
+            #contt
+            {
+                width: 300px;
+                left: 5px;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="editor">
+        <text>Editing mode</text>
+        <div id="conteiner">
+            <button class="close" id="no">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <button id="yes">
+                <i class="fa-solid fa-check"></i>
+            </button>
+        </div>
+        
+    </div>
+    <div id="contt">
+        <h1><span id="title" contenteditable></span></h1>
+        <span id="date" contenteditable></span>
+        <span id="author" contenteditable></span>
+        <span id="history" contenteditable></span>
+    </div>
+    <div id="pics">
+        <button id="addImage">Добавить картинку</button>
+    </div>
+    <script type="module" async>
+        const email = new URL(window.location.href).searchParams.get('email')
+        const password = new URL(window.location.href).searchParams.get('password')
+        const subj = new URL(window.location.href).searchParams.get('subj')
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js";
+        import { getDatabase, set, ref, get, child } from 'https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js'
+        import { getAuth, signInWithEmailAndPassword  } from 'https://www.gstatic.com/firebasejs/9.12.1/firebase-auth.js'
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxNxc57M_MX7Eq6I0BdTpw6y2ao7sC9rc",
+            authDomain: "dict-91af6.firebaseapp.com",
+            projectId: "dict-91af6",
+            storageBucket: "dict-91af6.appspot.com",
+            messagingSenderId: "43053199779",
+            appId: "1:43053199779:web:49d0a3fe6d50dde6b46a16",
+            databaseURL: "https://dict-91af6-default-rtdb.europe-west1.firebasedatabase.app/"
+
+        };
+
+        const app = await initializeApp(firebaseConfig);
+
+        const auth = await getAuth();
+        if (!auth.currentUser)
+        {
+            signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+            })
+            .catch((error) => {
+                alert(error)
+                window.open('index.html', '_self')
+            });
+        }
+
+        const db = await getDatabase(app);
+
+        function writeDb(dict)
+        {
+            set(ref(db), {dict})
+        }
+
+        async function readDb()
+        {
+            await get(child(ref(db), 'dict')).then((snapshot) => 
+            {
+                if (snapshot.exists()) 
+                {
+                    localStorage.setItem('snapshot', JSON.stringify(snapshot.val()))
+                    return snapshot.val()
+                }
+                else
+                {
+                    alert('no data')
+                }
+            }) 
+            .catch((error) => 
+            {
+                console.error(error);
+            });
+            let data = localStorage.getItem('snapshot')
+            localStorage.removeItem('snapshot')
+            return data
+        }
+
+        var dictionary = JSON.parse(await readDb())
+        Object.entries(dictionary).map((s, index) => {
+        if (subj === s[0]) 
+        {
+            localStorage.setItem('page', `${index}`)
+        }
+        })
+
+        const page = localStorage.getItem('page')
+        var title = document.getElementById('title')
+        var date = document.getElementById('date')
+        var author = document.getElementById('author')
+        var history = document.getElementById('history')
+        var pics = document.getElementById('pics')
+        var yes = document.getElementById('yes')
+        var no = document.getElementById('no')
+        var addImage = document.getElementById('addImage')
+
+        addImage.onclick = () => {
+            let picSrc = prompt('Введи ТОЛЬКО название картинки которая лежит в папке pics в репе')
+            let picDesc = prompt('Введи описание картинки')
+
+            let group = document.createElement('div')
+            group.className = "group"
+
+            let close = document.createElement('button')
+            close.style = "margin-bottom: 5px;"
+            close.className = "close"
+            close.innerHTML = '<i class="fa-solid fa-xmark"></i></button>'
+            close.onclick = () => {
+                let groups = document.getElementsByClassName('group')
+                if (groups.length > 1 && close.parentElement == groups[0])
+                {
+                    groups[1].style = ""
+                }
+                close.parentElement.remove()
+            }
+            group.appendChild(close)
+            
+            let picCont = document.createElement('div')
+            picCont.style = "position: relative"
+
+            let picsImg = document.createElement('img')
+            picsImg.src = `/pics/${picSrc}`
+
+            let closeImg = document.createElement('button')
+            closeImg.style = "position: absolute; right: 0px; top: -2px; border: none; border-radius: 0px"
+            closeImg.className = "close"
+            closeImg.innerHTML = '<i class="fa-solid fa-xmark"></i></button>'
+            closeImg.onclick = () => {
+                closeImg.parentElement.getElementsByTagName('img')[0].style.display = "none"
+                closeImg.style.display = "none"
+                closeImg.parentElement.getElementsByClassName('addImg')[0].style.display = 'block'                        
+            }
+
+            let addImg = document.createElement('button')
+            addImg.className = "addImg"
+            addImg.style = "display: none; width: 300px; height: 30px; outline: none; border: none; cursor: pointer; margin-top: 20px; margin-bottom: 20px"
+            addImg.innerText = 'Добавить картинку'
+            addImg.onclick = () => {
+                let newSrc = prompt('Введи ТОЛЬКО название картинки которая лежит в папке pics в репе')
+                closeImg.parentElement.getElementsByTagName('img')[0].src = '/pics/' + newSrc
+                closeImg.parentElement.getElementsByTagName('img')[0].style.display = "block"
+                closeImg.style.display = "block"
+                closeImg.parentElement.getElementsByClassName('addImg')[0].style.display = 'none'   
+            }
+
+            picCont.appendChild(addImg)
+            picCont.appendChild(closeImg)
+            picCont.appendChild(picsImg)
+            group.appendChild(picCont)
+
+            let desc = document.createElement('span')
+            desc.contentEditable = true
+            desc.className = "desc"
+            desc.innerText = picDesc
+            group.appendChild(desc)
+            let index = document.getElementsByClassName('group').length
+            if (index > 0)
+            {
+                group.style.width = "300px";
+                
+            }
+            pics.appendChild(group)
+        }
+
+        yes.onclick = () => {
+            Object.entries(dictionary).map((s, index) =>{
+            if (index == page)
+            {
+                let groups = document.getElementsByClassName('group')
+                let picsArr = []
+
+                for (let i = 0; i < groups.length; i++)
+                {
+                    picsArr.push
+                        ({
+                            "src": document.getElementsByClassName('group')[i].getElementsByTagName('img')[0].src.split('pics/')[1], 
+                            "desc": document.getElementsByClassName('group')[i].getElementsByTagName('span')[0].innerText
+                        })
+                }
+                let dictObj = 
+                {
+                    "history": history.innerHTML,
+                    "date": date.innerText,
+                    "author": author.innerText,
+                    "pics": picsArr,
+                    "meaning": dictionary[`${s[0]}`]["meaning"]
+                }
+                let newDict = dictionary
+                newDict[`${title.innerText}`] = dictObj
+                if (title.innerText != s[0])
+                {
+                    delete newDict[`${s[0]}`]
+                }
+                writeDb(newDict)
+                window.open('index.html', '_self')
+                
+            }})
+        }
+
+        no.onclick = () => {
+            window.open('index.html', '_self')
+        }
+
+        function closePic()
+        {
+            console.log(this)
+        }
+
+        Object.entries(dictionary).map((s, index) =>{
+            if (index == page)
+            {
+                title.innerText = s[0]
+                document.title = s[0]
+                date.innerText = s[1]["date"]
+                author.innerText = s[1]["author"]
+                history.innerHTML = s[1]["history"]
+                s[1]["pics"].map((pic, index) => {
+                    let group = document.createElement('div')
+                    group.className = "group"
+                    let close = document.createElement('button')
+                    close.style = "margin-bottom: 5px;"
+                    close.className = "close"
+                    close.innerHTML = '<i class="fa-solid fa-xmark"></i></button>'
+                    close.onclick = () => {
+                        let groups = document.getElementsByClassName('group')
+                        if (groups.length > 1 && close.parentElement == groups[0])
+                        {
+                            groups[1].style = ""
+                        }
+                        close.parentElement.remove()
+                    }
+                    group.appendChild(close)
+                    
+                    let picCont = document.createElement('div')
+                    picCont.style = "position: relative"
+
+                    let picsImg = document.createElement('img')
+                    picsImg.src = `/pics/${pic["src"]}`
+
+                    let closeImg = document.createElement('button')
+                    closeImg.style = "position: absolute; right: 0px; top: -2px; border: none; border-radius: 0px"
+                    closeImg.className = "close"
+                    closeImg.innerHTML = '<i class="fa-solid fa-xmark"></i></button>'
+                    closeImg.onclick = () => {
+                        closeImg.parentElement.getElementsByTagName('img')[0].style.display = "none"
+                        closeImg.style.display = "none"
+                        closeImg.parentElement.getElementsByClassName('addImg')[0].style.display = 'block'                        
+                    }
+
+                    let addImg = document.createElement('button')
+                    addImg.className = "addImg"
+                    addImg.style = "display: none; width: 300px; height: 30px; outline: none; border: none; cursor: pointer; margin-top: 20px; margin-bottom: 20px"
+                    addImg.innerText = 'Добавить картинку'
+                    addImg.onclick = () => {
+                        let newSrc = prompt('Введи ТОЛЬКО название картинки которая лежит в папке pics в репе')
+                        closeImg.parentElement.getElementsByTagName('img')[0].src = '/pics/' + newSrc
+                        closeImg.parentElement.getElementsByTagName('img')[0].style.display = "block"
+                        closeImg.style.display = "block"
+                        closeImg.parentElement.getElementsByClassName('addImg')[0].style.display = 'none'   
+                    }
+
+                    picCont.appendChild(addImg)
+                    picCont.appendChild(closeImg)
+                    picCont.appendChild(picsImg)
+                    group.appendChild(picCont)
+
+                    let desc = document.createElement('span')
+                    desc.contentEditable = true
+                    desc.className = "desc"
+                    desc.innerText = pic["desc"]
+                    group.appendChild(desc)
+                    if (index > 0)
+                    {
+                        group.style.width = "300px";
+                        
+                    }
+                    pics.appendChild(group)
+                })
+            }
+        })
+
+    </script>
+</body>
+</html>
