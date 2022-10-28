@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf8">
+    <meta name='viewport' content='width=device-width,initial-scale=1'>
+    <title>Словарь фриспиковца</title>
+    <script src="https://kit.fontawesome.com/1c40832f28.js" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,400;1,400&display=swap');
+        *
+        {
+            margin: 0px;
+            padding: 0px;
+            font-family: 'Roboto', sans-serif;
+        }
+        body
+        {
+            overflow-y: scroll;
+        }
+        li 
+        {
+            position: relative;
+            list-style: none;
+        }
+        .name
+        {
+            display: inline;
+        }
+        .description
+        {
+            display: inline-block;
+            width: fit-content;
+            padding-right: 37.5px;
+            word-break: break-word;
+        }
+        .cont
+        {
+            width: 520px;
+            border: 1px solid #1a1a1a;
+            padding: 20px;
+            margin-top: 10px;    
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+        .arrow
+        {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            display: none;
+            cursor: pointer;
+        }
+        .closeCont
+        {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #1a1a1a;
+            outline: none;
+            background-color: #fff;
+            display: block;
+            position: absolute;
+            right: 20px;
+            top: 34%;
+            border-radius: 5px;
+        }
+        .cont:hover > .arrow
+        {
+            display: block;
+        }
+        #title
+        {
+            width: fit-content;
+            padding: 20px;
+            margin: auto;
+            margin-top: 10px;
+            font-size: 40px;
+            
+        }
+        #dictionary
+        {
+            margin: auto;
+            margin-top: 20px;
+            width: fit-content;
+        }
+        #editor
+        {
+            width: 100%;
+            height: 24px;
+            background-color: rgba(30, 255, 0);
+
+        }
+        #editor text
+        {
+            color: #1a1a1a;
+            margin-left: 120px;
+        }
+        #yes, .close
+        {
+            width: 20px;
+            height: 20px;
+            outline: none;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 5px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+        #conteiner
+        {
+            display: inline;
+            margin-left: 20px;
+        }
+
+        #add
+        {
+            display: block;
+            margin: auto;
+            width: 50px;
+            height: 50px;
+            outline: none;
+            border: 1px solid #1a1a1a;
+            border-radius: 10px;
+            background-color: #fff;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        @media only screen and (max-width: 800px) {
+            *{
+                font-size: 15px;
+            }
+            #title
+            {
+                width: 300px;
+                font-size: 25px;
+            }
+            .cont
+            {
+                width: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="editor">
+        <text>Editing mode</text>
+        <div id="conteiner">
+            <button class="close" id="no">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <button id="yes">
+                <i class="fa-solid fa-check"></i>
+            </button>
+        </div>
+        
+    </div>
+    <div id="title">
+        Словарь фриспиковца
+    </div>
+    
+    <ul id="dictionary"></ul>
+    <button id="add"><i class="fa fa-plus fa-lg" aria-hidden="true"></i></button>
+    
+    
+    <script type="module" async>
+        const email = new URL(window.location.href).searchParams.get('email')
+        const password = new URL(window.location.href).searchParams.get('password')
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js";
+        import { getDatabase, set, ref, get, child } from 'https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js'
+        import { getAuth, signInWithEmailAndPassword  } from 'https://www.gstatic.com/firebasejs/9.12.1/firebase-auth.js'
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxNxc57M_MX7Eq6I0BdTpw6y2ao7sC9rc",
+            authDomain: "dict-91af6.firebaseapp.com",
+            projectId: "dict-91af6",
+            storageBucket: "dict-91af6.appspot.com",
+            messagingSenderId: "43053199779",
+            appId: "1:43053199779:web:49d0a3fe6d50dde6b46a16",
+            databaseURL: "https://dict-91af6-default-rtdb.europe-west1.firebasedatabase.app/"
+
+        };
+
+        const app = await initializeApp(firebaseConfig);
+
+        const auth = await getAuth();
+        if (!auth.currentUser)
+        {
+            signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+            })
+            .catch((error) => {
+                alert(error)
+                window.open('index.html', '_self')
+            });
+        }
+
+        const db = await getDatabase(app);
+
+        function writeDb(dict)
+        {
+            set(ref(db), {dict})
+        }
+
+        async function readDb()
+        {
+            await get(child(ref(db), 'dict')).then((snapshot) => 
+            {
+                if (snapshot.exists()) 
+                {
+                    localStorage.setItem('snapshot', JSON.stringify(snapshot.val()))
+                    return snapshot.val()
+                }
+                else
+                {
+                    alert('no data')
+                }
+            }) 
+            .catch((error) => 
+            {
+                console.error(error);
+            });
+            let data = localStorage.getItem('snapshot')
+            localStorage.removeItem('snapshot')
+            return data
+        }
+        const dictionary = JSON.parse(await readDb())
+
+        let url = new URL(window.location.href).searchParams.get('subj')
+        if (url)
+        {
+            Object.entries(dictionary).map((s) => {
+                if (url === s[0]) {
+                    localStorage.setItem('page', `${s[0]}`); window.open('page.html', "_self")
+                }
+            })
+        }
+        function load()
+        {
+            document.getElementById('dictionary').innerHTML = ''.concat(...Object.entries(dictionary).map((s, index) => `<li class="cont" id="${index}""><div class="description">${s[0]} - ${s[1]["meaning"]}</div><button class="arrow closeCont""><i class="fa-solid fa-xmark"></i></button></li>`))
+            let conts = document.getElementsByClassName('cont')
+            var arr = Array.prototype.slice.call( conts )
+            arr.map((s, index) => {
+                s.getElementsByClassName('description')[0].contentEditable = true
+                s.getElementsByClassName('description')[0].onblur = () => {
+                    s.getElementsByClassName('description')[0].innerText = s.getElementsByClassName('description')[0].innerText.replace( /\s\s+/g, ' ' )
+                    let temp = s.getElementsByClassName('description')[0].innerText.split(' - ')
+                    if (dictionary[`${temp[0]}`])
+                    {
+                        dictionary[`${temp[0]}`]["meaning"] = temp[1]
+                    } 
+                    else
+                    {
+                        Object.entries(dictionary).map((d, i) => {
+                            if (index === i)
+                            {
+                                dictionary[`${temp[0]}`] = d[1]
+                                dictionary[`${temp[0]}`]["meaning"] = temp[1]
+                                delete dictionary[`${d[0]}`]
+                            }
+                        })
+                    }
+                }
+            })
+            var closeCont = document.getElementsByClassName('closeCont')
+            for (let i = 0; i < closeCont.length; i++)
+            {
+                closeCont[i].onclick = () => {
+                    let name = closeCont[i].parentElement.getElementsByClassName('description')[0].innerText.split(' - ')[0]
+                    delete dictionary[`${name}`]
+                    load()
+                }
+            }
+        
+        }
+        load()
+        
+        var add = document.getElementById('add')
+        add.onclick = () => {
+            dictionary[""] = {"meaning": "", "history": "", "date": "", "author": "", "pics": []}
+            load()
+        }
+        var yes = document.getElementById('yes')
+        yes.onclick = () => {
+            writeDb(dictionary)
+            window.open("index.html", "_self")
+        }
+
+        var no = document.getElementById('no')
+        no.onclick = () => {
+            window.open("index.html", "_self")
+        }
+
+        
+    </script>
+</body>
+</html>

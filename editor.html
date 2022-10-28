@@ -187,6 +187,10 @@
         const email = new URL(window.location.href).searchParams.get('email')
         const password = new URL(window.location.href).searchParams.get('password')
         const subj = new URL(window.location.href).searchParams.get('subj')
+        if(!subj)
+        {
+            window.open("indexEditor.html", "_self")
+        }
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.12.1/firebase-app.js";
         import { getDatabase, set, ref, get, child } from 'https://www.gstatic.com/firebasejs/9.12.1/firebase-database.js'
