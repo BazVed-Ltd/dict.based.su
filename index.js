@@ -16,11 +16,10 @@ const db = await getDatabase(app);
 
 async function readDb()
 {
-    await get(child(ref(db), 'dict')).then((snapshot) => 
+    return await get(child(ref(db), 'dict')).then((snapshot) => 
     {
         if (snapshot.exists()) 
         {
-            localStorage.setItem('snapshot', JSON.stringify(snapshot.val()))
             return snapshot.val()
         }
         else
@@ -32,12 +31,9 @@ async function readDb()
     {
         console.error(error);
     });
-    let data = localStorage.getItem('snapshot')
-    localStorage.removeItem('snapshot')
-    return data
 }
 
-const dictionary = JSON.parse(await readDb())
+const dictionary = await readDb()
 
 let url = new URL(window.location.href).searchParams.get('subj')
 if (url)

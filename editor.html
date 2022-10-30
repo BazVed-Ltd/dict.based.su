@@ -235,11 +235,10 @@
 
         async function readDb()
         {
-            await get(child(ref(db), 'dict')).then((snapshot) => 
+            return await get(child(ref(db), 'dict')).then((snapshot) => 
             {
                 if (snapshot.exists()) 
                 {
-                    localStorage.setItem('snapshot', JSON.stringify(snapshot.val()))
                     return snapshot.val()
                 }
                 else
@@ -251,12 +250,9 @@
             {
                 console.error(error);
             });
-            let data = localStorage.getItem('snapshot')
-            localStorage.removeItem('snapshot')
-            return data
         }
 
-        var dictionary = JSON.parse(await readDb())
+        var dictionary = await readDb()
         Object.entries(dictionary).map((s, index) => {
         if (subj === s[0]) 
         {
