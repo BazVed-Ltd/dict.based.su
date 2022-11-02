@@ -355,7 +355,7 @@
                 }
                 let dictObj = 
                 {
-                    "history": history.innerHTML,
+                    "history": history.innerText,
                     "date": date.innerText,
                     "author": author.innerText,
                     "pics": picsArr,
@@ -389,7 +389,7 @@
                 document.title = s[0]
                 date.innerText = s[1]["date"]
                 author.innerText = s[1]["author"]
-                history.innerHTML = s[1]["history"]
+                history.innerText = s[1]["history"]
                 s[1]["pics"].map((pic, index) => {
                     let group = document.createElement('div')
                     group.className = "group"
