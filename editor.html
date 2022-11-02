@@ -389,7 +389,7 @@
                 document.title = s[0]
                 date.innerText = s[1]["date"]
                 author.innerText = s[1]["author"]
-                history.innerText = String(s[1]["history"])
+                history.innerHTML = s[1]["history"]
                 s[1]["pics"].map((pic, index) => {
                     let group = document.createElement('div')
                     group.className = "group"
