@@ -385,11 +385,11 @@
         Object.entries(dictionary).map((s, index) =>{
             if (index == page)
             {
-                title.innerText = s[0]
-                document.title = s[0]
-                date.innerText = s[1]["date"]
-                author.innerText = s[1]["author"]
-                history.innerText = s[1]["history"]
+                title.innerText = s[0] != "" ? s[0] : "заголовок"
+                document.title = s[0] != "" ? s[0] : "заголовок"
+                date.innerText = s[1]["date"] != "" ? s[1]["date"] : "дата"
+                author.innerText = s[1]["author"] != "" ? s[1]["author"] : "автор"
+                history.innerText = s[1]["history"] != "" ? s[1]["history"] : "история"
                 s[1]["pics"].map((pic, index) => {
                     let group = document.createElement('div')
                     group.className = "group"
